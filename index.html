@@ -608,13 +608,34 @@ function shuffle(arr) {
 // =====================================================================
 //  发音（Web Speech API）
 // =====================================================================
+var _speakTimer = null;
+
 function speak(text) {
-    if (!window.speechSynthesis) return;
-    window.speechSynthesis.cancel();
-    var u = new SpeechSynthesisUtterance(text);
-    u.lang = "en-US";
-    u.rate = 0.85;
-    window.speechSynthesis.speak(u);
+    var synth = window.speechSynthesis;
+    if (!synth) return;
+
+    // 停止正在播放的语音
+    synth.cancel();
+    clearTimeout(_speakTimer);
+
+    // 移动端有时需要微小延迟，确保 cancel 完成后再 speak
+    _speakTimer = setTimeout(function () {
+        var u = new SpeechSynthesisUtterance(text);
+        u.lang = "en-US";
+        u.rate = 0.85;
+        u.volume = 1;
+
+        // Android Chrome 有时会自动 pause 语音，用定时器保活
+        var keepAlive = setInterval(function () {
+            if (synth.speaking) {
+                synth.resume();
+            } else if (!synth.pending) {
+                clearInterval(keepAlive);
+            }
+        }, 3000);
+
+        synth.speak(u);
+    }, 50);
 }
 
 // =====================================================================
