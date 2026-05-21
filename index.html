@@ -606,8 +606,8 @@ function shuffle(arr) {
 }
 
 // =====================================================================
-//  发音（双引擎：Web Speech + 音频兜底）
-//  驼峰拆分：ArrayList → array list，LinkedList → linked list
+//  发音（音频优先 → Web Speech 兜底）
+//  缩写字母化：DDL → D D L，驼峰拆分：ArrayList → array list
 // =====================================================================
 
 var _ttsAudio = null;
@@ -619,52 +619,52 @@ var _ttsAudio = null;
     document.body.appendChild(_ttsAudio);
 })();
 
-// 把驼峰单词拆成可读词组：ArrayList → "array list", reduceByKey → "reduce by key"
+// 转成可朗读文本：缩写拼字母 / 驼峰拆分 / 全小写
 function toSpeakText(text) {
-    return text.replace(/([a-z])([A-Z])/g, "$1 $2").toLowerCase();
+    var words = text.split(/\s+/);
+    var result = [];
+    for (var i = 0; i < words.length; i++) {
+        var w = words[i];
+        // 全大写缩写（2字母及以上）→ 逐字母：DDL → D D L
+        if (/^[A-Z]{2,}$/.test(w)) {
+            result.push(w.split("").join(" "));
+        } else {
+            // 驼峰拆分 + 全小写：ArrayList → array list
+            result.push(w.replace(/([a-z])([A-Z])/g, "$1 $2").toLowerCase());
+        }
+    }
+    return result.join(" ");
 }
 
 function speak(text) {
     var pronounce = toSpeakText(text);
-    var synth = window.speechSynthesis;
 
-    // 引擎1: Web Speech API（Chrome/Edge 等原生浏览器）
-    if (synth && synth.getVoices().length > 0) {
-        synth.cancel();
-        var u = new SpeechSynthesisUtterance(pronounce);
-        u.lang = "en-GB";
-        u.rate = 0.85;
-        u.volume = 1;
-        var voices = synth.getVoices();
-        for (var i = 0; i < voices.length; i++) {
-            if (voices[i].lang === "en-GB" && voices[i].localService) {
-                u.voice = voices[i];
-                break;
-            }
-        }
-        // 没找到英式语音就用美式
-        if (!u.voice) {
-            for (var j = 0; j < voices.length; j++) {
-                if (voices[j].lang === "en-US" && voices[j].localService) {
-                    u.voice = voices[j];
-                    break;
-                }
-            }
-        }
-        synth.speak(u);
-        return;
-    }
-
-    // 引擎2: 在线音频（微信/QQ/所有浏览器通用）
+    // 引擎1: 在线音频（所有浏览器通用，微信/QQ/Chrome 都能出声）
     _ttsAudio.pause();
     _ttsAudio.currentTime = 0;
-    // 有道 type=1 是英式发音
     _ttsAudio.src = "https://dict.youdao.com/dictvoice?audio=" +
         encodeURIComponent(pronounce) + "&type=1";
     _ttsAudio.play().catch(function () {
+        // 有道不行换 Google
         _ttsAudio.src = "https://translate.google.com/translate_tts?ie=UTF-8" +
             "&client=tw-ob&tl=en-GB&q=" + encodeURIComponent(pronounce);
-        _ttsAudio.play();
+        _ttsAudio.play().catch(function () {
+            // 网络不行，回退到 Web Speech（Chrome 离线也能用）
+            var synth = window.speechSynthesis;
+            if (!synth) return;
+            synth.cancel();
+            var u = new SpeechSynthesisUtterance(pronounce);
+            u.lang = "en-GB";
+            u.rate = 0.85;
+            u.volume = 1;
+            var voices = synth.getVoices();
+            for (var k = 0; k < voices.length; k++) {
+                if (voices[k].lang === "en-GB" && voices[k].localService) {
+                    u.voice = voices[k]; break;
+                }
+            }
+            synth.speak(u);
+        });
     });
 }
 
