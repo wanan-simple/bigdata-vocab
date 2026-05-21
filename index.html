@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>大数据技术英语词汇</title>
+<style>
+/* ========== 基础 ========== */
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #f0f2f5; color: #333; min-height: 100vh; padding: 16px;
+}
+.container { max-width: 700px; margin: 0 auto; }
+
+/* ========== 头部 ========== */
+.header { text-align: center; margin-bottom: 16px; }
+.header h1 { font-size: 26px; color: #1a1a2e; margin-bottom: 4px; }
+.header .sub { font-size: 13px; color: #999; }
+
+/* ========== 模式切换 Tab ========== */
+.tabs {
+    display: flex; gap: 0; margin-bottom: 16px;
+    border-radius: 12px; overflow: hidden; background: #e0e0e0;
+}
+.tab {
+    flex: 1; text-align: center; padding: 12px;
+    font-size: 16px; font-weight: 600; cursor: pointer;
+    transition: background 0.2s; user-select: none;
+    background: #e8e8e8; color: #888;
+}
+.tab.active { background: #4a90d9; color: #fff; }
+
+/* ========== 技术栈标签 ========== */
+.tag-bar {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;
+    justify-content: center;
+}
+.tag-btn {
+    padding: 6px 14px; border-radius: 20px; font-size: 13px;
+    font-weight: 500; cursor: pointer; border: 2px solid #ccc;
+    background: #fff; color: #666; transition: all 0.2s;
+    user-select: none;
+}
+.tag-btn.on { color: #fff; }
+.tag-btn.on[data-tag="Java"]       { background: #f89820; border-color: #f89820; }
+.tag-btn.on[data-tag="MySQL"]      { background: #4479A1; border-color: #4479A1; }
+.tag-btn.on[data-tag="Linux"]      { background: #6b8e23; border-color: #6b8e23; }
+.tag-btn.on[data-tag="HDFS"]       { background: #2196F3; border-color: #2196F3; }
+.tag-btn.on[data-tag="MapReduce"]  { background: #009688; border-color: #009688; }
+.tag-btn.on[data-tag="YARN"]       { background: #00ACC1; border-color: #00ACC1; }
+.tag-btn.on[data-tag="Zookeeper"]  { background: #7E57C2; border-color: #7E57C2; }
+.tag-btn.on[data-tag="Hive"]       { background: #E37400; border-color: #E37400; }
+.tag-btn.on[data-tag="Spark"]      { background: #E25A1C; border-color: #E25A1C; }
+.tag-btn.on[data-tag="通用"]       { background: #888;    border-color: #888; }
+
+/* ========== 共享隐藏/显示 ========== */
+.panel { display: none; }
+.panel.show { display: block; }
+
+/* ==================== 练习模式 ==================== */
+.exercise-empty {
+    text-align: center; padding: 60px 20px; color: #aaa;
+}
+.exercise-empty .big-icon { font-size: 48px; margin-bottom: 12px; }
+
+.exercise-card {
+    background: #fff; border-radius: 16px; padding: 32px 24px;
+    text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    margin-bottom: 16px;
+}
+.ex-card-zh {
+    font-size: 26px; font-weight: 700; color: #1a1a2e;
+    margin-bottom: 4px; word-break: break-all;
+}
+.ex-card-en {
+    font-size: 30px; font-weight: 700; color: #1a1a2e;
+    margin-bottom: 4px; word-break: break-all;
+}
+.ex-card-tag {
+    display: inline-block; font-size: 12px; padding: 3px 10px;
+    border-radius: 10px; background: #e8f0fe; color: #4a90d9; margin-bottom: 16px;
+}
+.ex-card-input {
+    width: 100%; max-width: 360px; padding: 14px 16px; font-size: 20px;
+    text-align: center; border: 2px solid #e0e0e0; border-radius: 12px;
+    outline: none; transition: border-color 0.2s; margin-bottom: 12px;
+    letter-spacing: 1px;
+}
+.ex-card-input:focus { border-color: #4a90d9; }
+.ex-card-input.correct { border-color: #4caf50; background: #f1f8f1; }
+.ex-card-input.wrong   { border-color: #e53935; background: #fff5f5; }
+
+.ex-feedback { font-size: 16px; font-weight: 600; min-height: 28px; margin-bottom: 8px; }
+.ex-feedback.ok   { color: #4caf50; }
+.ex-feedback.fail { color: #e53935; }
+
+.ex-buttons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.btn {
+    padding: 12px 24px; border-radius: 10px; font-size: 15px;
+    font-weight: 600; cursor: pointer; border: none; transition: all 0.15s;
+    user-select: none;
+}
+.btn:active { transform: scale(0.96); }
+.btn-primary { background: #4a90d9; color: #fff; }
+.btn-outline { background: #fff; color: #4a90d9; border: 2px solid #4a90d9; }
+.btn-speaker { background: #fff; color: #4a90d9; border: 2px solid #e0e0e0; font-size: 20px; padding: 10px 18px; }
+.btn-ghost    { background: #f5f5f5; color: #888; }
+.btn-success  { background: #4caf50; color: #fff; }
+.btn-danger   { background: #e53935; color: #fff; }
+.btn:disabled { opacity: 0.4; pointer-events: none; }
+
+.ex-stats {
+    display: flex; gap: 20px; justify-content: center;
+    font-size: 15px; color: #666; margin-bottom: 12px;
+}
+.ex-stats .ok-count { color: #4caf50; font-weight: 700; }
+.ex-stats .fail-count { color: #e53935; font-weight: 700; }
+.ex-reset { text-align: center; margin-top: 8px; }
+.ex-reset button { font-size: 13px; color: #999; background: none; border: none; cursor: pointer; text-decoration: underline; }
+
+/* ==================== 查询模式 ==================== */
+.search-wrap { position: relative; margin-bottom: 12px; }
+.search-input {
+    width: 100%; padding: 14px 18px; font-size: 16px;
+    border: 2px solid #e0e0e0; border-radius: 12px; outline: none;
+    transition: border-color 0.2s;
+}
+.search-input:focus { border-color: #4a90d9; }
+.query-stats { text-align: center; font-size: 13px; color: #999; margin-bottom: 12px; }
+
+.word-list { display: flex; flex-direction: column; gap: 8px; }
+.word-card {
+    background: #fff; border-radius: 12px; padding: 14px 18px;
+    display: flex; align-items: center; justify-content: space-between;
+    cursor: pointer; box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    transition: transform 0.12s; user-select: none;
+}
+.word-card:active { transform: scale(0.98); }
+.word-card .l { display: flex; flex-direction: column; gap: 3px; }
+.word-card .en-text { font-size: 17px; font-weight: 600; color: #1a1a2e; }
+.word-card .zh-text { font-size: 13px; color: #888; }
+.word-card .t {
+    display: inline-block; font-size: 11px; background: #e8f0fe;
+    color: #4a90d9; padding: 1px 7px; border-radius: 5px; width: fit-content;
+}
+.word-card .spk { font-size: 20px; color: #4a90d9; flex-shrink: 0; margin-left: 10px; }
+
+/* ========== 手机端 ========== */
+@media (max-width: 480px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 20px; }
+    .ex-card-zh { font-size: 22px; }
+    .ex-card-en { font-size: 24px; }
+    .ex-card-input { font-size: 18px; padding: 12px; }
+    .btn { padding: 10px 18px; font-size: 14px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+    <!-- 头部 -->
+    <div class="header">
+        <h1>大数据技术英语词汇</h1>
+        <p class="sub">记单词 · 练拼写 · 听发音</p>
+    </div>
+
+    <!-- 模式切换 -->
+    <div class="tabs">
+        <div class="tab active" data-mode="exercise" id="tabExercise">🎯 练习模式</div>
+        <div class="tab" data-mode="query" id="tabQuery">🔍 查询模式</div>
+    </div>
+
+    <!-- 技术栈标签（两种模式共用） -->
+    <div class="tag-bar" id="tagBar"></div>
+
+    <!-- ========== 练习模式面板 ========== -->
+    <div class="panel show" id="panelExercise">
+        <!-- 未选标签时 -->
+        <div class="exercise-empty" id="exEmpty">
+            <div class="big-icon">📋</div>
+            <p>请先勾选上方技术栈标签，再开始练习</p>
+        </div>
+        <!-- 练习卡片 -->
+        <div class="exercise-card" id="exCard" style="display:none">
+            <div id="exZh" class="ex-card-zh"></div>
+            <div id="exEn" class="ex-card-en"></div>
+            <div id="exTag" class="ex-card-tag"></div>
+            <input type="text" class="ex-card-input" id="exInput" placeholder="输入英文拼写..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+            <div class="ex-feedback" id="exFeedback"></div>
+            <div class="ex-buttons" id="exButtons"></div>
+        </div>
+        <!-- 统计 -->
+        <div class="ex-stats" id="exStats" style="display:none">
+            <span>✅ <span class="ok-count" id="exOk">0</span></span>
+            <span>❌ <span class="fail-count" id="exFail">0</span></span>
+            <span>📝 <span id="exProgress">0/0</span></span>
+        </div>
+        <div class="ex-reset" id="exReset" style="display:none">
+            <button onclick="resetExercise()">重新开始本轮练习</button>
+        </div>
+    </div>
+
+    <!-- ========== 查询模式面板 ========== -->
+    <div class="panel" id="panelQuery">
+        <div class="search-wrap">
+            <input type="text" class="search-input" id="searchInput" placeholder="搜索单词或中文释义...">
+        </div>
+        <p class="query-stats" id="queryStats"></p>
+        <div class="word-list" id="wordList"></div>
+    </div>
+
+</div>
+
+<script>
+// =====================================================================
+//  词汇数据
+// =====================================================================
+var words = [
+    // --- Java SE ---
+    { en:"class",              zh:"类（对象的模板）",              tag:"Java" },
+    { en:"object",             zh:"对象（类的实例）",              tag:"Java" },
+    { en:"method",             zh:"方法",                          tag:"Java" },
+    { en:"variable",           zh:"变量",                          tag:"Java" },
+    { en:"constant",           zh:"常量",                          tag:"Java" },
+    { en:"interface",          zh:"接口（定义行为契约）",          tag:"Java" },
+    { en:"abstract",           zh:"抽象的（不能被实例化）",        tag:"Java" },
+    { en:"static",             zh:"静态的（属于类而非对象）",      tag:"Java" },
+    { en:"final",              zh:"最终的（不可修改/继承）",       tag:"Java" },
+    { en:"extends",            zh:"继承（子类 extends 父类）",     tag:"Java" },
+    { en:"implements",         zh:"实现（类 implements 接口）",    tag:"Java" },
+    { en:"overload",           zh:"重载（同方法名不同参数）",      tag:"Java" },
+    { en:"override",           zh:"重写（子类覆盖父类方法）",      tag:"Java" },
+    { en:"constructor",        zh:"构造方法（创建对象时调用）",    tag:"Java" },
+    { en:"polymorphism",       zh:"多态（父类引用指向子类对象）",  tag:"Java" },
+    { en:"encapsulation",      zh:"封装（隐藏内部实现细节）",      tag:"Java" },
+    { en:"inheritance",        zh:"继承（子类获得父类属性和方法）",tag:"Java" },
+    { en:"instance",           zh:"实例",                          tag:"Java" },
+    { en:"null",               zh:"空值",                          tag:"Java" },
+    { en:"annotation",         zh:"注解（如 @Override）",          tag:"Java" },
+    { en:"generic",            zh:"泛型（类型参数化）",            tag:"Java" },
+    { en:"enum",               zh:"枚举（限定取值的类型）",        tag:"Java" },
+    { en:"lambda",             zh:"Lambda 表达式（函数式编程）",   tag:"Java" },
+    { en:"reflection",         zh:"反射（运行时获取类信息）",      tag:"Java" },
+    { en:"serialization",      zh:"序列化（对象→字节流）",         tag:"Java" },
+    { en:"deserialization",    zh:"反序列化（字节流→对象）",       tag:"Java" },
+    { en:"exception",          zh:"异常（程序运行时的错误）",      tag:"Java" },
+    { en:"try",                zh:"try-catch 捕获异常",            tag:"Java" },
+    { en:"catch",              zh:"catch 处理异常",                tag:"Java" },
+    { en:"finally",            zh:"finally 总是执行的代码块",      tag:"Java" },
+    { en:"throw",              zh:"throw 抛出异常对象",             tag:"Java" },
+    { en:"throws",             zh:"声明方法可能抛出的异常",        tag:"Java" },
+    { en:"stack trace",        zh:"堆栈跟踪（异常调用链）",        tag:"Java" },
+    { en:"ArrayList",          zh:"动态数组（有序可重复）",        tag:"Java" },
+    { en:"LinkedList",         zh:"链表（增删快，查找慢）",        tag:"Java" },
+    { en:"HashMap",            zh:"哈希表（键值对，无序）",        tag:"Java" },
+    { en:"HashSet",            zh:"哈希集合（无序不重复）",        tag:"Java" },
+    { en:"TreeMap",            zh:"树形映射（键有序）",            tag:"Java" },
+    { en:"TreeSet",            zh:"树形集合（元素有序）",          tag:"Java" },
+    { en:"iterator",           zh:"迭代器（遍历集合元素）",        tag:"Java" },
+    { en:"comparable",         zh:"可比较的（自然排序接口）",      tag:"Java" },
+    { en:"comparator",         zh:"比较器（自定义排序）",          tag:"Java" },
+    { en:"thread",             zh:"线程（程序执行的最小单元）",    tag:"Java" },
+    { en:"runnable",           zh:"可运行的（线程任务接口）",      tag:"Java" },
+    { en:"synchronized",       zh:"同步锁（保证线程安全）",        tag:"Java" },
+    { en:"volatile",           zh:"可见性（变量变更立即可见）",    tag:"Java" },
+    { en:"lock",               zh:"锁（控制并发访问）",            tag:"Java" },
+    { en:"deadlock",           zh:"死锁（互相等待对方释放锁）",    tag:"Java" },
+    { en:"concurrent",         zh:"并发的",                        tag:"Java" },
+    { en:"atomic",             zh:"原子的（不可分割的操作）",      tag:"Java" },
+    { en:"semaphore",          zh:"信号量（控制同时访问线程数）",  tag:"Java" },
+    { en:"thread pool",        zh:"线程池（复用线程）",            tag:"Java" },
+    { en:"stream",             zh:"流（数据传输的抽象）",          tag:"Java" },
+    { en:"buffer",             zh:"缓冲区（暂存数据提高效率）",    tag:"Java" },
+    { en:"flush",              zh:"刷新（强制写出缓冲区数据）",    tag:"Java" },
+    { en:"close",              zh:"关闭（释放资源）",              tag:"Java" },
+    { en:"heap",               zh:"堆（存放对象实例的内存区）",    tag:"Java" },
+    { en:"stack",              zh:"栈（存放方法调用和局部变量）",  tag:"Java" },
+    { en:"garbage collection", zh:"垃圾回收（自动释放无引用对象）",tag:"Java" },
+    { en:"GC",                 zh:"垃圾回收 Garbage Collection",    tag:"Java" },
+    { en:"OOM",                zh:"内存溢出 Out Of Memory",         tag:"Java" },
+    { en:"classloader",        zh:"类加载器（加载 .class 文件）",  tag:"Java" },
+    { en:"bytecode",           zh:"字节码（.class 文件内容）",     tag:"Java" },
+    { en:"compile",            zh:"编译（源代码→字节码）",         tag:"Java" },
+
+    // --- MySQL ---
+    { en:"DDL",                zh:"数据定义语言 CREATE/ALTER/DROP",tag:"MySQL" },
+    { en:"DML",                zh:"数据操作语言 INSERT/UPDATE/DELETE", tag:"MySQL" },
+    { en:"DCL",                zh:"数据控制语言 GRANT/REVOKE",     tag:"MySQL" },
+    { en:"DQL",                zh:"数据查询语言 SELECT",           tag:"MySQL" },
+    { en:"database",           zh:"数据库",                        tag:"MySQL" },
+    { en:"table",              zh:"表",                            tag:"MySQL" },
+    { en:"schema",             zh:"模式/数据库结构",               tag:"MySQL" },
+    { en:"query",              zh:"查询 SELECT",                   tag:"MySQL" },
+    { en:"insert",             zh:"插入 INSERT",                   tag:"MySQL" },
+    { en:"update",             zh:"更新 UPDATE",                   tag:"MySQL" },
+    { en:"delete",             zh:"删除 DELETE",                   tag:"MySQL" },
+    { en:"truncate",           zh:"截断（清空表，比 DELETE 快）",  tag:"MySQL" },
+    { en:"drop",               zh:"删除（删除整个表或库）",        tag:"MySQL" },
+    { en:"alter",              zh:"修改（修改表结构）",            tag:"MySQL" },
+    { en:"select",             zh:"查询",                          tag:"MySQL" },
+    { en:"where",              zh:"条件 WHERE",                    tag:"MySQL" },
+    { en:"order by",           zh:"排序 ORDER BY",                 tag:"MySQL" },
+    { en:"group by",           zh:"分组 GROUP BY",                 tag:"MySQL" },
+    { en:"having",             zh:"分组后筛选 HAVING",             tag:"MySQL" },
+    { en:"distinct",           zh:"去重 DISTINCT",                 tag:"MySQL" },
+    { en:"limit",              zh:"限制返回行数 LIMIT",            tag:"MySQL" },
+    { en:"union",              zh:"联合 UNION",                    tag:"MySQL" },
+    { en:"alias",              zh:"别名 AS",                       tag:"MySQL" },
+    { en:"join",               zh:"连接查询 JOIN",                 tag:"MySQL" },
+    { en:"inner join",         zh:"内连接 INNER JOIN",             tag:"MySQL" },
+    { en:"left join",          zh:"左连接 LEFT JOIN",              tag:"MySQL" },
+    { en:"right join",         zh:"右连接 RIGHT JOIN",             tag:"MySQL" },
+    { en:"outer join",         zh:"全外连接 FULL OUTER JOIN",      tag:"MySQL" },
+    { en:"cross join",         zh:"交叉连接 CROSS JOIN",           tag:"MySQL" },
+    { en:"self join",          zh:"自连接（表自己连接自己）",      tag:"MySQL" },
+    { en:"aggregate",          zh:"聚合函数 COUNT/SUM/AVG",        tag:"MySQL" },
+    { en:"count",              zh:"计数 COUNT",                    tag:"MySQL" },
+    { en:"sum",                zh:"求和 SUM",                      tag:"MySQL" },
+    { en:"avg",                zh:"平均值 AVG",                    tag:"MySQL" },
+    { en:"subquery",           zh:"子查询（查询中嵌套查询）",      tag:"MySQL" },
+    { en:"primary key",        zh:"主键 PRIMARY KEY",              tag:"MySQL" },
+    { en:"foreign key",        zh:"外键 FOREIGN KEY",              tag:"MySQL" },
+    { en:"constraint",         zh:"约束",                          tag:"MySQL" },
+    { en:"index",              zh:"索引（加速查询）",              tag:"MySQL" },
+    { en:"composite index",    zh:"复合索引（多列索引）",          tag:"MySQL" },
+    { en:"transaction",        zh:"事务（一组不可分割的操作）",    tag:"MySQL" },
+    { en:"ACID",               zh:"事务四大特性",                  tag:"MySQL" },
+    { en:"commit",             zh:"提交 COMMIT",                   tag:"MySQL" },
+    { en:"rollback",           zh:"回滚 ROLLBACK",                 tag:"MySQL" },
+    { en:"isolation",          zh:"隔离级别",                      tag:"MySQL" },
+    { en:"dirty read",         zh:"脏读（读到未提交数据）",        tag:"MySQL" },
+    { en:"view",               zh:"视图（虚拟表）",                tag:"MySQL" },
+    { en:"stored procedure",   zh:"存储过程（预编译 SQL 集合）",   tag:"MySQL" },
+    { en:"trigger",            zh:"触发器",                        tag:"MySQL" },
+    { en:"cursor",             zh:"游标（逐行处理结果集）",        tag:"MySQL" },
+    { en:"explain",            zh:"执行计划 EXPLAIN",              tag:"MySQL" },
+    { en:"sharding",           zh:"分库分表（水平拆分）",          tag:"MySQL" },
+    { en:"master-slave",       zh:"主从复制（读写分离）",          tag:"MySQL" },
+
+    // --- Linux ---
+    { en:"shell",              zh:"命令行解释器（如 bash）",       tag:"Linux" },
+    { en:"kernel",             zh:"内核（操作系统核心）",          tag:"Linux" },
+    { en:"process",            zh:"进程（运行中的程序）",          tag:"Linux" },
+    { en:"permission",         zh:"权限（rwx 读/写/执行）",        tag:"Linux" },
+    { en:"directory",          zh:"目录（文件夹）",                tag:"Linux" },
+    { en:"daemon",             zh:"守护进程（后台运行的服务）",    tag:"Linux" },
+    { en:"pipeline",           zh:"管道 | ",                       tag:"Linux" },
+    { en:"cron",               zh:"定时任务",                      tag:"Linux" },
+    { en:"grep",               zh:"文本搜索",                      tag:"Linux" },
+    { en:"awk",                zh:"文本处理工具（按列处理）",      tag:"Linux" },
+
+    // --- HDFS ---
+    { en:"HDFS",               zh:"Hadoop 分布式文件系统",         tag:"HDFS" },
+    { en:"NameNode",           zh:"名称节点（管理元数据）",        tag:"HDFS" },
+    { en:"DataNode",           zh:"数据节点（存储数据块）",        tag:"HDFS" },
+    { en:"SecondaryNameNode",  zh:"辅助名称节点（合并 fsimage）",  tag:"HDFS" },
+    { en:"client",             zh:"客户端",                        tag:"HDFS" },
+    { en:"block",              zh:"数据块（默认 128MB）",          tag:"HDFS" },
+    { en:"replication",        zh:"副本（默认 3 份）",             tag:"HDFS" },
+    { en:"rack",               zh:"机架",                          tag:"HDFS" },
+    { en:"topology",           zh:"拓扑（网络布局关系）",          tag:"HDFS" },
+    { en:"fsimage",            zh:"文件系统镜像（元数据快照）",    tag:"HDFS" },
+    { en:"editlog",            zh:"编辑日志（元数据变更记录）",    tag:"HDFS" },
+    { en:"checkpoint",         zh:"检查点（合并 fsimage+editlog）",tag:"HDFS" },
+    { en:"safe mode",          zh:"安全模式（只读）",              tag:"HDFS" },
+    { en:"balancer",           zh:"均衡器（平衡数据分布）",        tag:"HDFS" },
+    { en:"heartbeat",          zh:"心跳（DataNode 汇报存活）",     tag:"HDFS" },
+    { en:"block report",       zh:"块报告（汇报有哪些 block）",    tag:"HDFS" },
+    { en:"pipeline",           zh:"流水线写入",                    tag:"HDFS" },
+    { en:"under-replicated",   zh:"副本不足",                      tag:"HDFS" },
+    { en:"corrupt block",      zh:"损坏块",                        tag:"HDFS" },
+    { en:"distcp",             zh:"分布式拷贝 distcp",             tag:"HDFS" },
+
+    // --- MapReduce ---
+    { en:"mapper",             zh:"映射器 Map 阶段",               tag:"MapReduce" },
+    { en:"reducer",            zh:"归约器 Reduce 阶段",            tag:"MapReduce" },
+    { en:"combiner",           zh:"合并器（Map 端预聚合）",        tag:"MapReduce" },
+    { en:"partitioner",        zh:"分区器（决定 key 去向）",       tag:"MapReduce" },
+    { en:"shuffle",            zh:"数据混洗 Map→Reduce",           tag:"MapReduce" },
+    { en:"sort",               zh:"排序（shuffle 阶段按 key 排）", tag:"MapReduce" },
+    { en:"merge",              zh:"合并（多个文件合并）",          tag:"MapReduce" },
+    { en:"spill",              zh:"溢写（内存不够写磁盘）",        tag:"MapReduce" },
+    { en:"split",              zh:"分片（输入的逻辑切块）",        tag:"MapReduce" },
+    { en:"InputFormat",        zh:"输入格式",                      tag:"MapReduce" },
+    { en:"OutputFormat",       zh:"输出格式",                      tag:"MapReduce" },
+    { en:"counter",            zh:"计数器",                        tag:"MapReduce" },
+    { en:"speculative",        zh:"推测执行（防止慢任务卡住）",    tag:"MapReduce" },
+
+    // --- YARN ---
+    { en:"YARN",               zh:"资源管理器",                    tag:"YARN" },
+    { en:"ResourceManager",    zh:"资源管理器主节点",              tag:"YARN" },
+    { en:"NodeManager",        zh:"节点管理器",                    tag:"YARN" },
+    { en:"ApplicationMaster",  zh:"应用管理器 AM",                 tag:"YARN" },
+    { en:"container",          zh:"容器（CPU+内存资源单位）",      tag:"YARN" },
+    { en:"scheduler",          zh:"调度器",                        tag:"YARN" },
+    { en:"queue",              zh:"队列",                          tag:"YARN" },
+
+    // --- Zookeeper ---
+    { en:"Zookeeper",          zh:"分布式协调服务",                tag:"Zookeeper" },
+    { en:"znode",              zh:"数据节点（ZK 树形节点）",       tag:"Zookeeper" },
+    { en:"cluster",            zh:"集群",                          tag:"Zookeeper" },
+    { en:"leader",             zh:"主节点（处理写请求）",          tag:"Zookeeper" },
+    { en:"follower",           zh:"从节点（处理读请求，参与选举）",tag:"Zookeeper" },
+    { en:"observer",           zh:"观察者（只读不投票）",          tag:"Zookeeper" },
+    { en:"quorum",             zh:"法定人数（过半）",              tag:"Zookeeper" },
+    { en:"session",            zh:"会话（客户端连接）",            tag:"Zookeeper" },
+    { en:"watcher",            zh:"监听器（znode 变化回调）",      tag:"Zookeeper" },
+    { en:"ZAB",                zh:"原子广播协议（一致性协议）",    tag:"Zookeeper" },
+    { en:"persistent",         zh:"持久节点",                      tag:"Zookeeper" },
+    { en:"ephemeral",          zh:"临时节点（断连自动删除）",      tag:"Zookeeper" },
+    { en:"sequential",         zh:"顺序节点（自动递增序号）",      tag:"Zookeeper" },
+    { en:"ACL",                zh:"访问控制列表（权限）",          tag:"Zookeeper" },
+    { en:"election",           zh:"选举（选出 Leader）",           tag:"Zookeeper" },
+    { en:"distributed lock",   zh:"分布式锁",                      tag:"Zookeeper" },
+
+    // --- Hive ---
+    { en:"Hive",               zh:"数据仓库工具 SQL→MR/Spark",     tag:"Hive" },
+    { en:"HQL",                zh:"Hive 查询语言（类 SQL）",       tag:"Hive" },
+    { en:"metastore",          zh:"元数据存储",                    tag:"Hive" },
+    { en:"SerDe",              zh:"序列化/反序列化器",             tag:"Hive" },
+    { en:"warehouse",          zh:"数据仓库目录",                  tag:"Hive" },
+    { en:"beeline",            zh:"Hive 命令行客户端",             tag:"Hive" },
+    { en:"managed table",      zh:"内部表（Hive 管数据）",         tag:"Hive" },
+    { en:"external table",     zh:"外部表（只管元数据）",          tag:"Hive" },
+    { en:"partition",          zh:"分区（按列分目录存）",          tag:"Hive" },
+    { en:"bucket",             zh:"分桶（按哈希分文件存）",        tag:"Hive" },
+    { en:"static partition",   zh:"静态分区（手动指定）",          tag:"Hive" },
+    { en:"dynamic partition",  zh:"动态分区（自动创建）",          tag:"Hive" },
+    { en:"ORC",                zh:"列式存储格式 ORC",              tag:"Hive" },
+    { en:"Parquet",            zh:"列式存储格式 Parquet",          tag:"Hive" },
+    { en:"Snappy",             zh:"压缩算法（快，压缩率中）",      tag:"Hive" },
+    { en:"Gzip",               zh:"压缩算法（高压缩率，不可拆分）",tag:"Hive" },
+    { en:"UDF",                zh:"用户自定义函数 一行进一行出",   tag:"Hive" },
+    { en:"UDAF",               zh:"用户自定义聚合 多行进一行出",   tag:"Hive" },
+    { en:"UDTF",               zh:"用户自定义表函数 一行进多行出", tag:"Hive" },
+    { en:"map join",           zh:"Map 端 Join（小表放内存）",     tag:"Hive" },
+    { en:"skew",               zh:"数据倾斜（某 key 数据量大）",   tag:"Hive" },
+    { en:"predicate pushdown", zh:"谓词下推（过滤提前执行）",      tag:"Hive" },
+    { en:"column pruning",     zh:"列裁剪（只读需要的列）",        tag:"Hive" },
+
+    // --- Spark ---
+    { en:"Spark",              zh:"分布式计算引擎（内存计算）",    tag:"Spark" },
+    { en:"RDD",                zh:"弹性分布式数据集（核心抽象）",  tag:"Spark" },
+    { en:"DataFrame",          zh:"数据框（带 schema 二维表）",    tag:"Spark" },
+    { en:"Dataset",            zh:"数据集（类型安全 DataFrame）",   tag:"Spark" },
+    { en:"SparkSession",       zh:"Spark 入口（2.0+）",            tag:"Spark" },
+    { en:"DAG",                zh:"有向无环图（任务依赖）",        tag:"Spark" },
+    { en:"job",                zh:"作业（一次 action 触发）",      tag:"Spark" },
+    { en:"stage",              zh:"阶段（按 shuffle 边界切）",     tag:"Spark" },
+    { en:"task",               zh:"任务（stage 内并行单元）",      tag:"Spark" },
+    { en:"map",                zh:"映射 map（一进一出）",          tag:"Spark" },
+    { en:"flatMap",            zh:"扁平映射 flatMap（一进多出）",   tag:"Spark" },
+    { en:"filter",             zh:"过滤 filter",                    tag:"Spark" },
+    { en:"reduceByKey",        zh:"按键归约 reduceByKey",           tag:"Spark" },
+    { en:"groupByKey",         zh:"按键分组 groupByKey",            tag:"Spark" },
+    { en:"sortByKey",          zh:"按键排序 sortByKey",             tag:"Spark" },
+    { en:"join",               zh:"连接 join",                     tag:"Spark" },
+    { en:"union",              zh:"合并 union",                    tag:"Spark" },
+    { en:"distinct",           zh:"去重 distinct",                 tag:"Spark" },
+    { en:"coalesce",           zh:"合并分区（不 shuffle）",        tag:"Spark" },
+    { en:"repartition",        zh:"重分区（会 shuffle）",          tag:"Spark" },
+    { en:"collect",            zh:"收集 collect（数据→Driver）",   tag:"Spark" },
+    { en:"count",              zh:"计数 count",                    tag:"Spark" },
+    { en:"take",               zh:"取前 N 行 take",                tag:"Spark" },
+    { en:"foreach",            zh:"逐条执行 foreach",              tag:"Spark" },
+    { en:"foreachPartition",   zh:"分区级 foreachPartition",       tag:"Spark" },
+    { en:"reduce",             zh:"归约 reduce",                   tag:"Spark" },
+    { en:"narrow dependency",  zh:"窄依赖（父分区→一子分区）",     tag:"Spark" },
+    { en:"wide dependency",    zh:"宽依赖（父分区→多子分区）",     tag:"Spark" },
+    { en:"lineage",            zh:"血缘关系（依赖链条，容错重算）",tag:"Spark" },
+    { en:"cache",              zh:"缓存 cache（存内存）",           tag:"Spark" },
+    { en:"persist",            zh:"持久化 persist",                 tag:"Spark" },
+    { en:"checkpoint",         zh:"检查点（截断血缘存 HDFS）",     tag:"Spark" },
+    { en:"Driver",             zh:"驱动器（发任务）",              tag:"Spark" },
+    { en:"Executor",           zh:"执行器（跑 task 的进程）",      tag:"Spark" },
+    { en:"cluster manager",    zh:"集群管理器 Standalone/YARN/K8s",tag:"Spark" },
+    { en:"shuffle",            zh:"数据混洗（分区间重新分布）",    tag:"Spark" },
+    { en:"broadcast variable", zh:"广播变量（小数据发所有节点）",  tag:"Spark" },
+    { en:"accumulator",        zh:"累加器（分布式计数）",          tag:"Spark" },
+    { en:"Kryo",               zh:"高性能序列化框架",              tag:"Spark" },
+    { en:"catalyst",           zh:"催化剂优化器（查询优化）",      tag:"Spark" },
+
+    // --- 通用大数据概念 ---
+    { en:"ETL",                zh:"抽取-转换-加载",                tag:"通用" },
+    { en:"ELT",                zh:"抽取-加载-转换",                tag:"通用" },
+    { en:"data warehouse",     zh:"数据仓库",                      tag:"通用" },
+    { en:"data lake",          zh:"数据湖",                        tag:"通用" },
+    { en:"data mart",          zh:"数据集市",                      tag:"通用" },
+    { en:"ODS",                zh:"操作数据层（贴源层）",          tag:"通用" },
+    { en:"DWD",                zh:"明细数据层",                    tag:"通用" },
+    { en:"DWS",                zh:"汇总数据层（轻度汇总）",        tag:"通用" },
+    { en:"ADS",                zh:"应用数据层（面向报表）",        tag:"通用" },
+    { en:"DIM",                zh:"维度表",                        tag:"通用" },
+    { en:"fact table",         zh:"事实表（度量数据）",            tag:"通用" },
+    { en:"star schema",        zh:"星型模型（一事实+多维度）",     tag:"通用" },
+    { en:"snowflake schema",   zh:"雪花模型（维度表规范化）",      tag:"通用" },
+    { en:"batch",              zh:"批处理",                        tag:"通用" },
+    { en:"streaming",          zh:"流处理",                        tag:"通用" },
+    { en:"throughput",         zh:"吞吐量",                        tag:"通用" },
+    { en:"latency",            zh:"延迟",                          tag:"通用" },
+    { en:"scalability",        zh:"可扩展性",                      tag:"通用" },
+    { en:"fault-tolerant",     zh:"容错",                          tag:"通用" },
+    { en:"high availability",  zh:"高可用 HA",                     tag:"通用" },
+    { en:"idempotent",         zh:"幂等（多次执行结果一致）",      tag:"通用" },
+    { en:"exactly-once",       zh:"精确一次（不丢不重）",          tag:"通用" },
+    { en:"at-least-once",      zh:"至少一次",                      tag:"通用" },
+    { en:"backpressure",       zh:"背压（反向控制上游速度）",      tag:"通用" },
+    { en:"serialize",          zh:"序列化（数据结构→字节）",       tag:"通用" },
+    { en:"deserialize",        zh:"反序列化（字节→数据结构）",     tag:"通用" },
+    { en:"columnar",           zh:"列式存储（按列组织）",          tag:"通用" },
+    { en:"row-based",          zh:"行式存储（按行组织）",          tag:"通用" },
+    { en:"OLAP",               zh:"联机分析处理",                  tag:"通用" },
+    { en:"OLTP",               zh:"联机事务处理",                  tag:"通用" },
+    { en:"snapshot",           zh:"快照（时间点数据镜像）",        tag:"通用" },
+    { en:"offset",             zh:"偏移量（Kafka 消息位置）",      tag:"通用" },
+    { en:"cold data",          zh:"冷数据（少访问）",              tag:"通用" },
+    { en:"hot data",           zh:"热数据（频繁访问）",            tag:"通用" },
+    { en:"lineage",            zh:"数据血缘（来源和流向）",        tag:"通用" },
+    { en:"reconciliation",     zh:"对账（比较数据一致性）",        tag:"通用" },
+    { en:"backfill",           zh:"回刷（补历史数据）",            tag:"通用" }
+];
+
+// =====================================================================
+//  全局状态
+// =====================================================================
+var currentMode = "exercise";        // "exercise" | "query"
+var selectedTags = {};               // { "Java": true, "Spark": true, ... }
+var allTags = [];
+
+// 练习状态
+var exPool = [];        // 当前词池（已选标签下的所有词，shuffle 后）
+var exIndex = 0;        // 当前做到第几个
+var exCorrect = 0;
+var exWrong = 0;
+var exAnswered = false; // 当前题是否已答过
+
+// =====================================================================
+//  初始化：提取所有标签，渲染标签栏
+// =====================================================================
+(function init() {
+    var tagSet = {};
+    for (var i = 0; i < words.length; i++) {
+        tagSet[words[i].tag] = true;
+    }
+    allTags = Object.keys(tagSet);
+    renderTagBar();
+    switchMode("exercise");
+})();
+
+function renderTagBar() {
+    var html = "";
+    for (var i = 0; i < allTags.length; i++) {
+        var t = allTags[i];
+        var cls = selectedTags[t] ? "tag-btn on" : "tag-btn";
+        html += '<span class="' + cls + '" data-tag="' + t + '" onclick="toggleTag(\'' + t + '\')">' + t + '</span>';
+    }
+    document.getElementById("tagBar").innerHTML = html;
+}
+
+function toggleTag(tag) {
+    if (selectedTags[tag]) {
+        delete selectedTags[tag];
+    } else {
+        selectedTags[tag] = true;
+    }
+    renderTagBar();
+    if (currentMode === "exercise") {
+        startExercise();
+    } else {
+        renderQuery();
+    }
+}
+
+// =====================================================================
+//  模式切换
+// =====================================================================
+function switchMode(mode) {
+    currentMode = mode;
+    document.getElementById("tabExercise").className = mode === "exercise" ? "tab active" : "tab";
+    document.getElementById("tabQuery").className    = mode === "query"    ? "tab active" : "tab";
+    document.getElementById("panelExercise").className = mode === "exercise" ? "panel show" : "panel";
+    document.getElementById("panelQuery").className    = mode === "query"    ? "panel show" : "panel";
+
+    if (mode === "exercise") {
+        startExercise();
+    } else {
+        renderQuery();
+    }
+}
+
+document.getElementById("tabExercise").addEventListener("click", function () { switchMode("exercise"); });
+document.getElementById("tabQuery").addEventListener("click",    function () { switchMode("query"); });
+
+// =====================================================================
+//  工具函数：Fisher-Yates 洗牌
+// =====================================================================
+function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+    }
+    return a;
+}
+
+// =====================================================================
+//  发音（Web Speech API）
+// =====================================================================
+function speak(text) {
+    if (!window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = "en-US";
+    u.rate = 0.85;
+    window.speechSynthesis.speak(u);
+}
+
+// =====================================================================
+//  练习模式
+// =====================================================================
+function startExercise() {
+    // 收集已选标签的词
+    var pool = [];
+    for (var i = 0; i < words.length; i++) {
+        if (selectedTags[words[i].tag]) {
+            pool.push(words[i]);
+        }
+    }
+
+    var card = document.getElementById("exCard");
+    var empty = document.getElementById("exEmpty");
+    var stats = document.getElementById("exStats");
+    var reset = document.getElementById("exReset");
+
+    if (pool.length === 0) {
+        card.style.display = "none";
+        stats.style.display = "none";
+        reset.style.display = "none";
+        empty.style.display = "block";
+        return;
+    }
+
+    empty.style.display = "none";
+    card.style.display = "block";
+    stats.style.display = "flex";
+    reset.style.display = "block";
+
+    exPool = shuffle(pool);
+    exIndex = 0;
+    exCorrect = 0;
+    exWrong = 0;
+    exAnswered = false;
+
+    showExerciseCard();
+    updateExStats();
+}
+
+function showExerciseCard() {
+    if (exIndex >= exPool.length) {
+        // 一轮结束，自动重新洗牌
+        exPool = shuffle(exPool);
+        exIndex = 0;
+    }
+
+    var w = exPool[exIndex];
+    var isSpelling = Math.random() < 0.33; // 约 1/3 的概率是拼写题
+
+    exAnswered = false;
+
+    document.getElementById("exFeedback").innerHTML = "";
+    document.getElementById("exFeedback").className = "ex-feedback";
+    var input = document.getElementById("exInput");
+    input.value = "";
+    input.className = "ex-card-input";
+    input.dataset.answer = w.en;
+    input.dataset.spelling = isSpelling ? "1" : "0";
+
+    var tagEl = document.getElementById("exTag");
+    tagEl.textContent = w.tag;
+    // 给标签加颜色
+    tagEl.style.background = getTagBg(w.tag);
+    tagEl.style.color = "#fff";
+
+    if (isSpelling) {
+        // 拼写题：显示中文，你需要拼英文
+        document.getElementById("exZh").style.display = "block";
+        document.getElementById("exEn").style.display = "none";
+        document.getElementById("exZh").textContent = w.zh;
+        input.style.display = "inline-block";
+        input.focus();
+        document.getElementById("exButtons").innerHTML =
+            '<button class="btn btn-primary" id="btnSubmit" onclick="checkSpelling()">提交</button>' +
+            '<button class="btn btn-speaker" onclick="speak(\'' + escapeJS(w.en) + '\')" title="听发音提示">🔊</button>';
+    } else {
+        // 识别题：显示英文，你判断认不认识
+        document.getElementById("exZh").style.display = "none";
+        document.getElementById("exEn").style.display = "block";
+        document.getElementById("exEn").textContent = w.en;
+        input.style.display = "none";
+        document.getElementById("exButtons").innerHTML =
+            '<button class="btn btn-speaker" onclick="speak(\'' + escapeJS(w.en) + '\')">🔊 听发音</button>' +
+            '<button class="btn btn-danger" id="btnDontKnow" onclick="revealAnswer()">不认识</button>' +
+            '<button class="btn btn-success" id="btnKnow" onclick="markCorrect()">认识</button>';
+    }
+}
+
+function getTagBg(tag) {
+    var map = {
+        "Java":"#f89820","MySQL":"#4479A1","Linux":"#6b8e23","HDFS":"#2196F3",
+        "MapReduce":"#009688","YARN":"#00ACC1","Zookeeper":"#7E57C2",
+        "Hive":"#E37400","Spark":"#E25A1C","通用":"#888"
+    };
+    return map[tag] || "#888";
+}
+
+function escapeJS(s) { return s.replace(/\\/g,"\\\\").replace(/'/g,"\\'"); }
+
+// --- 拼写题：检查答案 ---
+function checkSpelling() {
+    if (exAnswered) return;
+    exAnswered = true;
+
+    var input = document.getElementById("exInput");
+    var userAnswer = input.value.trim().toLowerCase();
+    var correct = input.dataset.answer.toLowerCase();
+    var fb = document.getElementById("exFeedback");
+
+    // 模糊匹配：忽略大小写、忽略多余空格
+    if (userAnswer === correct) {
+        exCorrect++;
+        input.className = "ex-card-input correct";
+        fb.innerHTML = "✅ 正确！" + (userAnswer !== input.dataset.answer ? "（答案: " + input.dataset.answer + "）" : "");
+        fb.className = "ex-feedback ok";
+    } else {
+        exWrong++;
+        input.className = "ex-card-input wrong";
+        fb.innerHTML = "❌ 正确答案: <strong>" + input.dataset.answer + "</strong>";
+        fb.className = "ex-feedback fail";
+        // 拼错时自动朗读
+        speak(input.dataset.answer);
+    }
+
+    updateExStats();
+    var en = input.dataset.answer;
+    document.getElementById("exButtons").innerHTML =
+        '<button class="btn btn-speaker" onclick="speak(\'' + escapeJS(en) + '\')">🔊 听发音</button>' +
+        '<button class="btn btn-primary" onclick="nextQuestion()">下一题 →</button>';
+}
+
+// --- 识别题：不认识，显示答案 ---
+function revealAnswer() {
+    if (exAnswered) return;
+    exAnswered = true;
+    exWrong++;
+
+    var w = exPool[exIndex];
+    // 同时显示英文和中文
+    document.getElementById("exEn").style.display = "block";
+    document.getElementById("exZh").style.display = "block";
+    document.getElementById("exEn").textContent = w.en;
+    document.getElementById("exZh").textContent = w.zh;
+    document.getElementById("exFeedback").innerHTML = "💡 记住它，下次就认识了";
+    document.getElementById("exFeedback").className = "ex-feedback fail";
+
+    updateExStats();
+    document.getElementById("exButtons").innerHTML =
+        '<button class="btn btn-speaker" onclick="speak(\'' + escapeJS(w.en) + '\')">🔊 再听一遍</button>' +
+        '<button class="btn btn-primary" onclick="nextQuestion()">下一题 →</button>';
+}
+
+// --- 识别题：认识，正确 ---
+function markCorrect() {
+    if (exAnswered) return;
+    exAnswered = true;
+    exCorrect++;
+
+    var w = exPool[exIndex];
+    // 同时显示英文和中文，方便复习
+    document.getElementById("exEn").style.display = "block";
+    document.getElementById("exZh").style.display = "block";
+    document.getElementById("exZh").textContent = w.zh;
+    document.getElementById("exFeedback").innerHTML = "✅ 不错！";
+    document.getElementById("exFeedback").className = "ex-feedback ok";
+
+    updateExStats();
+    document.getElementById("exButtons").innerHTML =
+        '<button class="btn btn-speaker" onclick="speak(\'' + escapeJS(w.en) + '\')">🔊 听发音</button>' +
+        '<button class="btn btn-primary" onclick="nextQuestion()">下一题 →</button>';
+}
+
+function nextQuestion() {
+    exIndex++;
+    showExerciseCard();
+    updateExStats();
+}
+
+function updateExStats() {
+    document.getElementById("exOk").textContent = exCorrect;
+    document.getElementById("exFail").textContent = exWrong;
+    document.getElementById("exProgress").textContent = (exCorrect + exWrong) + " / " + exPool.length;
+}
+
+function resetExercise() {
+    startExercise();
+}
+
+// 回车键提交拼写
+document.addEventListener("keydown", function (e) {
+    if (currentMode !== "exercise") return;
+    if (e.key === "Enter" && !exAnswered) {
+        var input = document.getElementById("exInput");
+        if (input.style.display !== "none" && input.dataset.spelling === "1") {
+            checkSpelling();
+        }
+    }
+});
+
+// =====================================================================
+//  查询模式
+// =====================================================================
+function renderQuery() {
+    var keyword = document.getElementById("searchInput").value.trim().toLowerCase();
+
+    var filtered = words.filter(function (w) {
+        // 标签过滤
+        var hasSelected = false;
+        for (var k in selectedTags) { hasSelected = true; break; }
+        if (hasSelected && !selectedTags[w.tag]) return false;
+
+        // 关键词过滤
+        if (keyword === "") return true;
+        return w.en.toLowerCase().indexOf(keyword) !== -1
+            || w.zh.indexOf(keyword) !== -1;
+    });
+
+    document.getElementById("queryStats").textContent =
+        "共 " + filtered.length + " 个词汇" +
+        (keyword ? "（匹配 \"" + keyword + "\"）" : "");
+
+    var html = "";
+    for (var i = 0; i < filtered.length; i++) {
+        var w = filtered[i];
+        html +=
+            '<div class="word-card" onclick="speak(\'' + escapeJS(w.en) + '\')">' +
+                '<div class="l">' +
+                    '<span class="en-text">' + w.en + '</span>' +
+                    '<span class="zh-text">' + w.zh + '</span>' +
+                    '<span class="t">' + w.tag + '</span>' +
+                '</div>' +
+                '<span class="spk">🔊</span>' +
+            '</div>';
+    }
+    document.getElementById("wordList").innerHTML = html;
+}
+
+document.getElementById("searchInput").addEventListener("input", renderQuery);
+</script>
+</body>
+</html>
