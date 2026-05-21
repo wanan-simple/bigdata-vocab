@@ -607,11 +607,11 @@ function shuffle(arr) {
 
 // =====================================================================
 //  发音（双引擎：Web Speech + 音频兜底）
+//  驼峰拆分：ArrayList → array list，LinkedList → linked list
 // =====================================================================
 
 var _ttsAudio = null;
 
-// 初始化 Audio 元素，所有浏览器都能用
 (function initAudio() {
     _ttsAudio = document.createElement("audio");
     _ttsAudio.id = "ttsAudio";
@@ -619,48 +619,51 @@ var _ttsAudio = null;
     document.body.appendChild(_ttsAudio);
 })();
 
+// 把驼峰单词拆成可读词组：ArrayList → "array list", reduceByKey → "reduce by key"
+function toSpeakText(text) {
+    return text.replace(/([a-z])([A-Z])/g, "$1 $2").toLowerCase();
+}
+
 function speak(text) {
+    var pronounce = toSpeakText(text);
     var synth = window.speechSynthesis;
 
-    // 引擎1: Web Speech API，需要浏览器原生支持且有语音包
+    // 引擎1: Web Speech API（Chrome/Edge 等原生浏览器）
     if (synth && synth.getVoices().length > 0) {
         synth.cancel();
-        var u = new SpeechSynthesisUtterance(text);
-        u.lang = "en-US";
+        var u = new SpeechSynthesisUtterance(pronounce);
+        u.lang = "en-GB";
         u.rate = 0.85;
         u.volume = 1;
         var voices = synth.getVoices();
         for (var i = 0; i < voices.length; i++) {
-            if (voices[i].lang === "en-US" && voices[i].localService) {
+            if (voices[i].lang === "en-GB" && voices[i].localService) {
                 u.voice = voices[i];
                 break;
+            }
+        }
+        // 没找到英式语音就用美式
+        if (!u.voice) {
+            for (var j = 0; j < voices.length; j++) {
+                if (voices[j].lang === "en-US" && voices[j].localService) {
+                    u.voice = voices[j];
+                    break;
+                }
             }
         }
         synth.speak(u);
         return;
     }
 
-    // 引擎2: 在线 TTS 音频，微信/QQ/所有浏览器通用
-    // 按单词数量自动选接口（短词用有道，长文本用 Google）
-    var wordCount = text.split(/\s+/).length;
-    if (wordCount <= 3) {
-        // 有道词典 TTS，国内快
-        _ttsAudio.src = "https://dict.youdao.com/dictvoice?audio=" +
-            encodeURIComponent(text) + "&type=0";
-    } else {
-        // Google TTS，短语更自然
-        _ttsAudio.src = "https://translate.google.com/translate_tts?ie=UTF-8" +
-            "&client=tw-ob&tl=en&q=" + encodeURIComponent(text);
-    }
+    // 引擎2: 在线音频（微信/QQ/所有浏览器通用）
+    _ttsAudio.pause();
+    _ttsAudio.currentTime = 0;
+    // 有道 type=1 是英式发音
+    _ttsAudio.src = "https://dict.youdao.com/dictvoice?audio=" +
+        encodeURIComponent(pronounce) + "&type=1";
     _ttsAudio.play().catch(function () {
-        // 有道挂了换 Google，Google 挂了换有道
-        if (wordCount <= 3) {
-            _ttsAudio.src = "https://translate.google.com/translate_tts?ie=UTF-8" +
-                "&client=tw-ob&tl=en&q=" + encodeURIComponent(text);
-        } else {
-            _ttsAudio.src = "https://dict.youdao.com/dictvoice?audio=" +
-                encodeURIComponent(text) + "&type=0";
-        }
+        _ttsAudio.src = "https://translate.google.com/translate_tts?ie=UTF-8" +
+            "&client=tw-ob&tl=en-GB&q=" + encodeURIComponent(pronounce);
         _ttsAudio.play();
     });
 }
