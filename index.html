@@ -606,55 +606,63 @@ function shuffle(arr) {
 }
 
 // =====================================================================
-//  发音（Web Speech API）
+//  发音（双引擎：Web Speech + 音频兜底）
 // =====================================================================
 
-// 预加载语音列表，解决安卓 Chrome 首次无声音的问题
-(function preloadVoices() {
-    if (!window.speechSynthesis) return;
-    var voices = speechSynthesis.getVoices();
-    if (voices.length === 0) {
-        speechSynthesis.onvoiceschanged = function () {
-            speechSynthesis.getVoices();
-        };
-    }
+var _ttsAudio = null;
+
+// 初始化 Audio 元素，所有浏览器都能用
+(function initAudio() {
+    _ttsAudio = document.createElement("audio");
+    _ttsAudio.id = "ttsAudio";
+    _ttsAudio.preload = "auto";
+    document.body.appendChild(_ttsAudio);
 })();
 
 function speak(text) {
     var synth = window.speechSynthesis;
-    if (!synth) {
-        alert("当前浏览器不支持语音功能，请使用 Chrome 浏览器");
+
+    // 引擎1: Web Speech API，需要浏览器原生支持且有语音包
+    if (synth && synth.getVoices().length > 0) {
+        synth.cancel();
+        var u = new SpeechSynthesisUtterance(text);
+        u.lang = "en-US";
+        u.rate = 0.85;
+        u.volume = 1;
+        var voices = synth.getVoices();
+        for (var i = 0; i < voices.length; i++) {
+            if (voices[i].lang === "en-US" && voices[i].localService) {
+                u.voice = voices[i];
+                break;
+            }
+        }
+        synth.speak(u);
         return;
     }
 
-    // 取消当前朗读
-    synth.cancel();
-
-    var u = new SpeechSynthesisUtterance(text);
-    u.lang = "en-US";
-    u.rate = 0.85;
-    u.volume = 1;
-
-    // 尝试选择美式英语语音（提高兼容性）
-    var voices = synth.getVoices();
-    for (var i = 0; i < voices.length; i++) {
-        if (voices[i].lang === "en-US" && voices[i].localService) {
-            u.voice = voices[i];
-            break;
-        }
+    // 引擎2: 在线 TTS 音频，微信/QQ/所有浏览器通用
+    // 按单词数量自动选接口（短词用有道，长文本用 Google）
+    var wordCount = text.split(/\s+/).length;
+    if (wordCount <= 3) {
+        // 有道词典 TTS，国内快
+        _ttsAudio.src = "https://dict.youdao.com/dictvoice?audio=" +
+            encodeURIComponent(text) + "&type=0";
+    } else {
+        // Google TTS，短语更自然
+        _ttsAudio.src = "https://translate.google.com/translate_tts?ie=UTF-8" +
+            "&client=tw-ob&tl=en&q=" + encodeURIComponent(text);
     }
-
-    // 直接朗读，不在 setTimeout 里（安卓上延迟会丢失用户手势上下文）
-    synth.speak(u);
-
-    // 安卓 Chrome 长时间不说话会自动 pause，短暂保活
-    var keepAlive = setInterval(function () {
-        if (synth.speaking) {
-            synth.resume();
+    _ttsAudio.play().catch(function () {
+        // 有道挂了换 Google，Google 挂了换有道
+        if (wordCount <= 3) {
+            _ttsAudio.src = "https://translate.google.com/translate_tts?ie=UTF-8" +
+                "&client=tw-ob&tl=en&q=" + encodeURIComponent(text);
         } else {
-            clearInterval(keepAlive);
+            _ttsAudio.src = "https://dict.youdao.com/dictvoice?audio=" +
+                encodeURIComponent(text) + "&type=0";
         }
-    }, 8000);
+        _ttsAudio.play();
+    });
 }
 
 // =====================================================================
