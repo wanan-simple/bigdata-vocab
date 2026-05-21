@@ -608,34 +608,53 @@ function shuffle(arr) {
 // =====================================================================
 //  发音（Web Speech API）
 // =====================================================================
-var _speakTimer = null;
+
+// 预加载语音列表，解决安卓 Chrome 首次无声音的问题
+(function preloadVoices() {
+    if (!window.speechSynthesis) return;
+    var voices = speechSynthesis.getVoices();
+    if (voices.length === 0) {
+        speechSynthesis.onvoiceschanged = function () {
+            speechSynthesis.getVoices();
+        };
+    }
+})();
 
 function speak(text) {
     var synth = window.speechSynthesis;
-    if (!synth) return;
+    if (!synth) {
+        alert("当前浏览器不支持语音功能，请使用 Chrome 浏览器");
+        return;
+    }
 
-    // 停止正在播放的语音
+    // 取消当前朗读
     synth.cancel();
-    clearTimeout(_speakTimer);
 
-    // 移动端有时需要微小延迟，确保 cancel 完成后再 speak
-    _speakTimer = setTimeout(function () {
-        var u = new SpeechSynthesisUtterance(text);
-        u.lang = "en-US";
-        u.rate = 0.85;
-        u.volume = 1;
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = "en-US";
+    u.rate = 0.85;
+    u.volume = 1;
 
-        // Android Chrome 有时会自动 pause 语音，用定时器保活
-        var keepAlive = setInterval(function () {
-            if (synth.speaking) {
-                synth.resume();
-            } else if (!synth.pending) {
-                clearInterval(keepAlive);
-            }
-        }, 3000);
+    // 尝试选择美式英语语音（提高兼容性）
+    var voices = synth.getVoices();
+    for (var i = 0; i < voices.length; i++) {
+        if (voices[i].lang === "en-US" && voices[i].localService) {
+            u.voice = voices[i];
+            break;
+        }
+    }
 
-        synth.speak(u);
-    }, 50);
+    // 直接朗读，不在 setTimeout 里（安卓上延迟会丢失用户手势上下文）
+    synth.speak(u);
+
+    // 安卓 Chrome 长时间不说话会自动 pause，短暂保活
+    var keepAlive = setInterval(function () {
+        if (synth.speaking) {
+            synth.resume();
+        } else {
+            clearInterval(keepAlive);
+        }
+    }, 8000);
 }
 
 // =====================================================================
