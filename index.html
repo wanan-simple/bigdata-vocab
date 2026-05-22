@@ -606,18 +606,9 @@ function shuffle(arr) {
 }
 
 // =====================================================================
-//  发音（Web Speech 原生引擎 + 音频兜底）
+//  发音
 //  缩写字母化：DDL → D D L，驼峰拆分：ArrayList → array list
 // =====================================================================
-
-// 初始化 TTS：QQ浏览器/微信需要先触发一次 voiceschanged 才能正常 speak
-(function initTTS() {
-    if (!window.speechSynthesis) return;
-    speechSynthesis.getVoices(); // 触发加载
-    speechSynthesis.onvoiceschanged = function () {
-        speechSynthesis.getVoices(); // 缓存语音列表
-    };
-})();
 
 // 转成可朗读文本：缩写拼字母 / 驼峰拆分 / 全小写
 function toSpeakText(text) {
@@ -634,55 +625,70 @@ function toSpeakText(text) {
     return result.join(" ");
 }
 
-var _fallbackAudio = null;
+// 检测是否 QQ / 微信浏览器（WebView 内核，speechSynthesis 有但不工作）
+function isBadWebView() {
+    var ua = navigator.userAgent.toLowerCase();
+    return ua.indexOf("mqqbrowser") !== -1
+        || ua.indexOf("micromessenger") !== -1
+        || ua.indexOf(" qq/") !== -1;
+}
+
+var _ttsAudio = null;
 
 function speak(text) {
     var pronounce = toSpeakText(text);
 
-    // 提前创建一个 Audio 在手势上下文内（避免 setTimeout 里被拦截）
-    if (!_fallbackAudio) {
-        _fallbackAudio = new Audio();
-        _fallbackAudio.preload = "auto";
-    }
-
-    var synth = window.speechSynthesis;
-    if (!synth) { playAudio(pronounce); return; }
-
-    synth.cancel();
-    var u = new SpeechSynthesisUtterance(pronounce);
-    u.lang = "en-GB";
-    u.rate = 0.85;
-    u.volume = 1;
-
-    var voices = synth.getVoices();
-    for (var i = 0; i < voices.length; i++) {
-        if (voices[i].lang === "en-GB" && voices[i].localService) { u.voice = voices[i]; break; }
-    }
-    if (!u.voice) {
-        for (var j = 0; j < voices.length; j++) {
-            if (voices[j].lang === "en-US" && voices[j].localService) { u.voice = voices[j]; break; }
+    // Chrome / Edge / Safari：用原生 Web Speech API（离线、快）
+    if (!isBadWebView() && window.speechSynthesis) {
+        var synth = window.speechSynthesis;
+        synth.cancel();
+        var u = new SpeechSynthesisUtterance(pronounce);
+        u.lang = "en-GB";
+        u.rate = 0.85;
+        u.volume = 1;
+        var voices = synth.getVoices();
+        for (var i = 0; i < voices.length; i++) {
+            if (voices[i].lang === "en-GB" && voices[i].localService) { u.voice = voices[i]; break; }
         }
+        if (!u.voice) {
+            for (var j = 0; j < voices.length; j++) {
+                if (voices[j].lang === "en-US" && voices[j].localService) { u.voice = voices[j]; break; }
+            }
+        }
+        synth.speak(u);
+        // 600ms 后检测是否真的在读，无声则走音频兜底
+        (function () {
+            setTimeout(function () {
+                if (!synth.speaking && !synth.pending) {
+                    synth.cancel();
+                    tryAudio(pronounce);
+                }
+            }, 600);
+        })();
+        return;
     }
 
-    synth.speak(u);
-
-    // 600ms 后检测引擎是否真的在朗读（QQ 浏览器可能无声）
-    setTimeout(function () {
-        if (!synth.speaking && !synth.pending) {
-            synth.cancel();
-            playAudio(pronounce);
-        }
-    }, 600);
+    // QQ/微信浏览器 或 无 Web Speech：直接走在线音频
+    tryAudio(pronounce);
 }
 
-function playAudio(text) {
-    _fallbackAudio.pause();
-    _fallbackAudio.src = "https://dict.youdao.com/dictvoice?audio=" +
-        encodeURIComponent(text) + "&type=1";
-    _fallbackAudio.play().catch(function () {
-        _fallbackAudio.src = "https://translate.google.com/translate_tts?ie=UTF-8" +
-            "&client=tw-ob&tl=en-GB&q=" + encodeURIComponent(text);
-        _fallbackAudio.play();
+function tryAudio(text) {
+    if (!_ttsAudio) { _ttsAudio = new Audio(); }
+    _ttsAudio.pause();
+    // 百度翻译 TTS（国内服务器，快）
+    var baiduUrl = "https://fanyi.baidu.com/gettts?lan=uk&text=" +
+        encodeURIComponent(text) + "&spd=3&source=web";
+    _ttsAudio.src = baiduUrl;
+    _ttsAudio.play().catch(function () {
+        // 百度不行换有道
+        _ttsAudio.src = "https://dict.youdao.com/dictvoice?audio=" +
+            encodeURIComponent(text) + "&type=1";
+        _ttsAudio.play().catch(function () {
+            // 有道不行换 Google
+            _ttsAudio.src = "https://translate.google.com/translate_tts?ie=UTF-8" +
+                "&client=tw-ob&tl=en-GB&q=" + encodeURIComponent(text);
+            _ttsAudio.play();
+        });
     });
 }
 
