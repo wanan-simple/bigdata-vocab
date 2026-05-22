@@ -625,12 +625,10 @@ function toSpeakText(text) {
     return result.join(" ");
 }
 
-// 检测是否 QQ / 微信浏览器（WebView 内核，speechSynthesis 有但不工作）
-function isBadWebView() {
+// 微信内置浏览器：speechSynthesis 有但不工作，需走音频
+function isWeChat() {
     var ua = navigator.userAgent.toLowerCase();
-    return ua.indexOf("mqqbrowser") !== -1
-        || ua.indexOf("micromessenger") !== -1
-        || ua.indexOf(" qq/") !== -1;
+    return ua.indexOf("micromessenger") !== -1;
 }
 
 var _ttsAudio = null;
@@ -639,7 +637,7 @@ function speak(text) {
     var pronounce = toSpeakText(text);
 
     // Chrome / Edge / Safari：用原生 Web Speech API（离线、快）
-    if (!isBadWebView() && window.speechSynthesis) {
+    if (!isWeChat() && window.speechSynthesis) {
         var synth = window.speechSynthesis;
         synth.cancel();
         var u = new SpeechSynthesisUtterance(pronounce);
