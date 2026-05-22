@@ -634,22 +634,31 @@ function _loadMeSpeak(cb) {
     _mSLoading = true;
 
     var script = document.createElement("script");
-    script.src = "https://cdn.jsdelivr.net/npm/mespeak@2.3.2/lib/mespeak.min.js";
+    script.src = "lib/mespeak.js";
     script.onerror = function () { _mSLoading = false; };
     script.onload = function () {
-        meSpeak.loadConfig(window.mespeakConfig || {});
-        var xhr = new XMLHttpRequest();
-        xhr.open("GET", "https://cdn.jsdelivr.net/npm/mespeak@2.3.2/voices/en/en-gb.json");
-        xhr.responseType = "text";
-        xhr.onload = function () {
-            meSpeak.loadVoice(JSON.parse(xhr.responseText));
-            _mSReady = true;
-            _mSLoading = false;
-            for (var i = 0; i < _mSQueue.length; i++) _mSQueue[i]();
-            _mSQueue = [];
+        // 1) 加载语音配置
+        var xhrCfg = new XMLHttpRequest();
+        xhrCfg.open("GET", "lib/mespeak_config.json");
+        xhrCfg.responseType = "text";
+        xhrCfg.onload = function () {
+            meSpeak.loadConfig(JSON.parse(xhrCfg.responseText));
+            // 2) 加载英式英语语音包
+            var xhrVox = new XMLHttpRequest();
+            xhrVox.open("GET", "voices/en-gb.json");
+            xhrVox.responseType = "text";
+            xhrVox.onload = function () {
+                meSpeak.loadVoice(JSON.parse(xhrVox.responseText));
+                _mSReady = true;
+                _mSLoading = false;
+                for (var i = 0; i < _mSQueue.length; i++) _mSQueue[i]();
+                _mSQueue = [];
+            };
+            xhrVox.onerror = function () { _mSLoading = false; };
+            xhrVox.send();
         };
-        xhr.onerror = function () { _mSLoading = false; };
-        xhr.send();
+        xhrCfg.onerror = function () { _mSLoading = false; };
+        xhrCfg.send();
     };
     document.head.appendChild(script);
 }
